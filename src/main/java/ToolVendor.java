@@ -1,7 +1,8 @@
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -55,24 +56,37 @@ public class ToolVendor{
 
 
     private void promptForRentalRequests(){
-        String userInput = "";
+        String toolCode = "";
 
         Scanner inputReader = new Scanner(System.in);  // Reading from System.in
 
-        while(!userInput.equalsIgnoreCase("exit")){
+        while(!toolCode.equalsIgnoreCase("exit")){
             System.out.print("Enter a Tool Code to make a rental ('exit to close the application'): ");
-            userInput = inputReader.next();
+            toolCode = inputReader.next();
             // put some validation here potentially
-            System.out.println(userInput);
 
             // find tool with tool codd
-            Tool matchingTool = findToolWithToolCode(userInput);
+            Tool matchingTool = findToolWithToolCode(toolCode);
             if(matchingTool == null){
                 System.out.println("No tool found with that Tool Code, please enter a valid Tool Code");
             } else{
-                System.out.println(matchingTool);
-                // handle checkout
+                System.out.print("How many days is the customer renting the tool for: ");
+                int rentalDays = inputReader.nextInt();
+
+                System.out.print("What is the Discount percent (0-100): ");
+                int discountPercent = inputReader.nextInt();
+
+                System.out.print("What is the checkout date (mm-dd-YY): ");
+                String checkoutDateStr = inputReader.next();
+                DateFormat format = new SimpleDateFormat("MM-dd-YY", Locale.ENGLISH);
+                try{
+                    Date checkoutDate = format.parse(checkoutDateStr);
+                    matchingTool.checkout(rentalDays, discountPercent, checkoutDate);
+                } catch(ParseException e) {
+                    System.out.println("Invalid checkout date. Use format MM-dd-YY ex. 12-25-21");
+                }
             }
+
         }
 
         inputReader.close();
@@ -83,12 +97,7 @@ public class ToolVendor{
                 .filter(tool -> toolCode.equals(tool.getToolCode()))
                 .collect(Collectors.toList());
 
-        if (result.size() == 0){
-            return null;
-        } else{
-            return result.get(0);
-        }
-
+        return (result.size() > 0) ? result.get(0) : null;
     }
 
 

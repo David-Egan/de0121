@@ -1,4 +1,6 @@
+import java.math.BigDecimal;
 import java.util.Currency;
+import java.util.Date;
 import java.util.Objects;
 
 public class Tool{
@@ -12,6 +14,7 @@ public class Tool{
     private ToolType toolType;
     private String brand;
     private String toolCode;
+    private BigDecimal dailyRentalCharge;
 
     private boolean hasWeekdayCharge;
     private boolean hasWeekendCharge;
@@ -24,12 +27,22 @@ public class Tool{
         switch(toolType){
             case "Ladder":
                 this.toolType = ToolType.Ladder;
-//                hasWeekdayCharge =
+                this.hasWeekendCharge = true;
+                this.hasHolidayCharge = false;
+                this.dailyRentalCharge = BigDecimal.valueOf(1.99);
             case "Chainsaw":
                 this.toolType = ToolType.Chainsaw;
+                this.hasWeekendCharge = false;
+                this.hasHolidayCharge = true;
+                this.dailyRentalCharge = BigDecimal.valueOf(1.49);
             case "Jackhammer":
                 this.toolType = ToolType.Jackhammer;
+                this.hasWeekendCharge = false;
+                this.hasHolidayCharge = false;
+                this.dailyRentalCharge = BigDecimal.valueOf(2.99);
         }
+
+        this.hasWeekdayCharge = true;
 
         this.brand = brand;
         this.toolCode = toolCode;
@@ -37,6 +50,23 @@ public class Tool{
 
     public String getToolCode() {
         return toolCode;
+    }
+
+    public String getBrand(){
+        return brand;
+    }
+
+    public ToolType getToolType(){
+        return toolType;
+    }
+
+    public BigDecimal getDailyRentalCharge(){
+        return dailyRentalCharge;
+    }
+
+    public void checkout(int rentalDays, int discountPercent, Date checkoutDate){
+        RentalAgreement rentalAgreement = new RentalAgreement(this, rentalDays, discountPercent, checkoutDate);
+        rentalAgreement.prettyPrintAgreement();
     }
 
     @Override
