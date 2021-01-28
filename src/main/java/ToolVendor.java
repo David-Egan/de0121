@@ -1,4 +1,7 @@
+import jdk.internal.util.xml.impl.Input;
+
 import java.io.*;
+import java.net.URL;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -10,7 +13,7 @@ import java.util.stream.Collectors;
  */
 public class ToolVendor{
 
-    private static String TOOLS_LISTING_PATH = "./src/main/resources/tools.csv";
+    private static String TOOLS_LISTING_PATH = "/tools.csv";
 
     private static ToolVendor toolVendor;
     private List<Tool> availableTools;
@@ -58,7 +61,8 @@ public class ToolVendor{
     private List<Tool> readToolsFromFile() throws IOException {
         List<Tool> loadedTools = new ArrayList<>();
 
-        BufferedReader reader = new BufferedReader(new FileReader(TOOLS_LISTING_PATH));
+        InputStream is = this.getClass().getResourceAsStream(TOOLS_LISTING_PATH);
+        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
         String line = null;
 
         while ((line = reader.readLine()) != null) {
