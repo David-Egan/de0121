@@ -9,6 +9,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ToolVendorTest {
 
+    /**
+     * Assumes we are using the tools.csv resource with tools matching those added to expectedAvailableTools
+     */
     @Test
     void loadToolsTest() throws IOException {
         List<Tool> expectedAvailableTools = new ArrayList<Tool>();
@@ -16,7 +19,6 @@ public class ToolVendorTest {
         expectedAvailableTools.add(new Tool("Chainsaw", "Stihl", "CHNS"));
         expectedAvailableTools.add(new Tool("Jackhammer", "Ridgid", "JAKR"));
         expectedAvailableTools.add(new Tool("Jackhammer", "DeWalt", "JAKD"));
-
 
         ToolVendor toolVendor = ToolVendor.getInstance();
         List<Tool> actualAvailableTools = toolVendor.getAvailableTools();

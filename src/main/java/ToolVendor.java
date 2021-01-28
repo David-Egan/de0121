@@ -1,12 +1,12 @@
 import java.io.*;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * Singleton class to...
+ * Singleton class to handle checking out one or more tools, communicates with users.
  */
 public class ToolVendor{
 
@@ -15,10 +15,17 @@ public class ToolVendor{
     private static ToolVendor toolVendor;
     private List<Tool> availableTools;
 
+    /**
+     * Construct a ToolVendor object. This includes loading in the tools to be
+     * available in the system.
+     */
     private ToolVendor() throws IOException{
         loadTools();
     }
 
+    /**
+     * Get an instance of a ToolVendor ensuring more than one instance can exist at once.
+     */
     public static ToolVendor getInstance() throws IOException{
         if(toolVendor == null){
             toolVendor = new ToolVendor();
@@ -27,14 +34,27 @@ public class ToolVendor{
         return toolVendor;
     }
 
+    /**
+     * Run the ToolVendor. Prompt the user for a rental and process that request.
+     */
+    public void run(){
+        promptForRentalRequests();
+    }
+
     public List<Tool> getAvailableTools(){
         return availableTools;
     }
 
+    /**
+     * Load in tools from a file to set availableTools field.
+     */
     private void loadTools() throws IOException{
         availableTools = readToolsFromFile();
     }
 
+    /**
+     * Read in Tools from a .csv file and compose them into a list of Tool instances.
+     */
     private List<Tool> readToolsFromFile() throws IOException {
         List<Tool> loadedTools = new ArrayList<>();
 
@@ -50,55 +70,112 @@ public class ToolVendor{
         return loadedTools;
     }
 
-    public void run(){
-        promptForRentalRequests();
-    }
-
-
+    /**
+     * Ask user for details on a rental and checkout that Tool.
+     */
     private void promptForRentalRequests(){
         String toolCode = "";
 
         Scanner inputReader = new Scanner(System.in);  // Reading from System.in
+        boolean isUserDone = false;
 
-        while(!toolCode.equalsIgnoreCase("exit")){
-            System.out.print("Enter a Tool Code to make a rental ('exit to close the application'): ");
-            toolCode = inputReader.next();
-            // put some validation here potentially
+        do{
+            toolCode = promptForToolCode(inputReader);
 
-            // find tool with tool codd
+            // find tool with tool code
             Tool matchingTool = findToolWithToolCode(toolCode);
             if(matchingTool == null){
                 System.out.println("No tool found with that Tool Code, please enter a valid Tool Code");
             } else{
-                System.out.print("How many days is the customer renting the tool for: ");
-                int rentalDays = inputReader.nextInt();
-
-                System.out.print("What is the Discount percent (0-100): ");
-                int discountPercent = inputReader.nextInt();
-
-                System.out.print("What is the checkout date (mm-dd-YY): ");
-                String checkoutDateStr = inputReader.next();
-                DateFormat format = new SimpleDateFormat("MM-dd-YY", Locale.ENGLISH);
                 try{
-                    Date checkoutDate = format.parse(checkoutDateStr);
+                    int rentalDays = promptForRentalDays(inputReader);
+                    int discountPercent = promptForDiscountRate(inputReader);
+                    LocalDate checkoutDate = promptForCheckoutDate(inputReader);
+
                     matchingTool.checkout(rentalDays, discountPercent, checkoutDate);
-                } catch(ParseException e) {
-                    System.out.println("Invalid checkout date. Use format MM-dd-YY ex. 12-25-21");
+                } catch(InputMismatchException ex){
+                    System.out.printf("\nInvalid Input: '%s'\n", ex.getMessage());
+                    System.out.println("Please try checking out the rental again...\n");
+                    continue;
+                } catch(Exception ex){
+                    System.out.printf("\nAn exception occurred processing user input: '%s'\n", ex.getMessage());
+                    System.out.println("Please try checking out the rental again...\n");
+                    continue;
                 }
+
+                String userDoneInput = "";
+                while(!userDoneInput.equalsIgnoreCase("n") && !userDoneInput.equalsIgnoreCase("y")){
+                    System.out.print("Checkout another tool? (y/n): ");
+                    userDoneInput = inputReader.next();
+                }
+
+                isUserDone = userDoneInput.equalsIgnoreCase("n");
+                System.out.println();
             }
 
         }
+        while(!isUserDone);
 
         inputReader.close();
     }
 
+    /**
+     * Ask user for tool code.
+     */
+    private String promptForToolCode(Scanner inputReader){
+        System.out.print("Enter a Tool Code to make a rental: ");
+        return inputReader.next();
+    }
+
+    /**
+     * Ask user for valid rental days.
+     */
+    private int promptForRentalDays(Scanner inputReader) throws InputMismatchException{
+        System.out.print("How many days is the customer renting the tool for: ");
+        int rentalDays = inputReader.nextInt();
+        if(rentalDays < 1){
+            throw new InputMismatchException("Rental Days must be 1 or greater");
+        }
+
+        return rentalDays;
+    }
+
+    /**
+     * Ask user for valid discount rate.
+     */
+    private int promptForDiscountRate(Scanner inputReader) throws InputMismatchException{
+        System.out.print("What is the Discount percent (0-100): ");
+        int discountPercent = inputReader.nextInt();
+        if(discountPercent > 100 || discountPercent < 0){
+            throw new InputMismatchException("Discount percent must be between 0 and 100");
+        }
+
+        return discountPercent;
+    }
+
+    /**
+     * Ask user for valid checkout date.
+     */
+    private LocalDate promptForCheckoutDate(Scanner inputReader) throws DateTimeParseException {
+        System.out.print("What is the checkout date (mm-dd-YY): ");
+        String checkoutDateStr = inputReader.next();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM-dd-yy");
+        formatter = formatter.withLocale( Locale.ENGLISH );
+
+        return LocalDate.parse(checkoutDateStr, formatter);
+    }
+
+    /**
+     * Look for tool code within Tools loaded into ToolVendor. Return the matching tool.
+     */
     private Tool findToolWithToolCode(String toolCode){
+        if(availableTools == null || availableTools.size() == 0) return null;
+
         List<Tool> result = availableTools.stream()
                 .filter(tool -> toolCode.equals(tool.getToolCode()))
                 .collect(Collectors.toList());
 
         return (result.size() > 0) ? result.get(0) : null;
     }
-
 
 }
