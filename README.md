@@ -1,5 +1,7 @@
 # Tool Rental Application 
 
+*Note: This application targets Java 8
+
 This can be run as a command line application. The tools that can be selected are specified inside of the tools.csv file. The specifications of different tool types can be found at
 the bottom of this README.
 
