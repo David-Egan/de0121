@@ -52,7 +52,6 @@ public class ToolTest {
         assertEquals(BigDecimal.valueOf(3.98).setScale(2), rentalAgreement.getPreDiscountCharge());
         assertEquals(BigDecimal.valueOf(0.40).setScale(2),rentalAgreement.getDiscountAmount());
         assertEquals(BigDecimal.valueOf(3.58).setScale(2), rentalAgreement.getFinalCharge());
-
     }
 
     @Test
@@ -67,7 +66,6 @@ public class ToolTest {
         assertEquals(BigDecimal.valueOf(4.47).setScale(2), rentalAgreement.getPreDiscountCharge());
         assertEquals(BigDecimal.valueOf(1.12).setScale(2),rentalAgreement.getDiscountAmount());
         assertEquals(BigDecimal.valueOf(3.35).setScale(2), rentalAgreement.getFinalCharge());
-
     }
 
     @Test

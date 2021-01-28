@@ -37,8 +37,8 @@ public class Tool{
     }
 
     private ToolType toolType;
-    private String brand;
-    private String toolCode;
+    private final String brand;
+    private final String toolCode;
     private BigDecimal dailyRentalCharge;
     private boolean hasWeekdayCharge;
     private boolean hasWeekendCharge;
@@ -54,15 +54,14 @@ public class Tool{
         setToolSpecificFields(toolType);
     }
 
-
     /**
      * Checkout a tool which will create a RentalAgreement based on the Tool and its rental details.
      */
     public RentalAgreement checkout(int rentalDays, int discountPercent, LocalDate checkoutDate){
-        if(rentalDays < 1){
+        if(!RentalAgreement.isRentalDaysValid(rentalDays)){
             throw new IllegalArgumentException("Rental Days must be 1 or greater");
         }
-        if(discountPercent > 100 || discountPercent < 0){
+        if(!RentalAgreement.isRentalDiscountPercentValid(discountPercent)){
             throw new IllegalArgumentException("Discount percent must be between 0 and 100");
         }
 

@@ -11,10 +11,10 @@ import java.util.*;
  */
 public class RentalAgreement{
 
-    private Tool rentedTool;
-    private int rentalDays;
-    private int discountPercent;
-    private LocalDate checkoutDate;
+    private final Tool rentedTool;
+    private final int rentalDays;
+    private final int discountPercent;
+    private final LocalDate checkoutDate;
 
     private LocalDate dueDate;
     private int chargeDays;
@@ -33,6 +33,20 @@ public class RentalAgreement{
         this.checkoutDate = checkoutDate;
 
         calculateChargeDetails();
+    }
+
+    /**
+     * Determine if a given rental day amount is valid in the context of a Rental Agreement.
+     */
+    public static boolean isRentalDaysValid(int rentalDays){
+        return rentalDays >= 1;
+    }
+
+    /**
+     * Determine if a given discount percent is valid in the context of a Rental Agreement.
+     */
+    public static boolean isRentalDiscountPercentValid(int discountPercent){
+        return (discountPercent <= 100 && discountPercent >= 0);
     }
 
     /**
@@ -57,8 +71,6 @@ public class RentalAgreement{
         System.out.printf("Discount amount: %s%n", usdFormatter.format(discountAmount));
         System.out.printf("Final charge: %s%n", usdFormatter.format(finalCharge));
         System.out.println();
-
-
     }
 
     public LocalDate getDueDate() {

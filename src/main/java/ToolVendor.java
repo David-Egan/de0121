@@ -1,7 +1,4 @@
-import jdk.internal.util.xml.impl.Input;
-
 import java.io.*;
-import java.net.URL;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -13,7 +10,7 @@ import java.util.stream.Collectors;
  */
 public class ToolVendor{
 
-    private static String TOOLS_LISTING_PATH = "/tools.csv";
+    private static final String TOOLS_LISTING_PATH = "/tools.csv";
 
     private static ToolVendor toolVendor;
     private List<Tool> availableTools;
@@ -137,7 +134,7 @@ public class ToolVendor{
     private int promptForRentalDays(Scanner inputReader) throws InputMismatchException{
         System.out.print("How many days is the customer renting the tool for: ");
         int rentalDays = inputReader.nextInt();
-        if(rentalDays < 1){
+        if(!RentalAgreement.isRentalDaysValid(rentalDays)){
             throw new InputMismatchException("Rental Days must be 1 or greater");
         }
 
@@ -150,7 +147,7 @@ public class ToolVendor{
     private int promptForDiscountRate(Scanner inputReader) throws InputMismatchException{
         System.out.print("What is the Discount percent (0-100): ");
         int discountPercent = inputReader.nextInt();
-        if(discountPercent > 100 || discountPercent < 0){
+        if(!RentalAgreement.isRentalDiscountPercentValid(discountPercent)){
             throw new InputMismatchException("Discount percent must be between 0 and 100");
         }
 
